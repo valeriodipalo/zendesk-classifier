@@ -15,6 +15,7 @@ def build_cli() -> argparse.ArgumentParser:
     p.add_argument("ticket_id", type=int, help="Zendesk ticket id to classify")
     p.add_argument("--llm", action="store_true", help="Use LLM classifier instead of rule-based")
     p.add_argument("--vector", action="store_true", help="Use LLM + Qdrant vector context")
+    p.add_argument("--debug", action="store_true", help="Enable verbose debug logging")
     p.add_argument("--support-staff-ids", type=str, default="25419196369051", help="Comma-separated support staff user IDs")
     return p
 
@@ -30,6 +31,9 @@ def main() -> None:
         if env_path.exists():
             load_dotenv(env_path)
 
+    if args.debug:
+        os.environ["DEBUG_CLASSIFIER"] = "1"
+
     config = ZendeskConfig.from_env()
     client = ZendeskClient(config)
 
@@ -41,6 +45,12 @@ def main() -> None:
     subject = data.get("subject", "")
     conversation_items = data.get("conversation", [])
     conversation_text = "\n\n---\n\n".join([f"{item['role']}:\n{item['message']}" for item in conversation_items])
+
+    if os.getenv("DEBUG_CLASSIFIER") == "1":
+        print("\n=== MAIN DEBUG ===")
+        print("Subject:", subject)
+        print("Conversation items:", len(conversation_items))
+        print("Conversation text length:", len(conversation_text))
 
     if args.vector:
         classifier = VectorLlmClassifier()

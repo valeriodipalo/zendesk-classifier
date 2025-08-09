@@ -12,6 +12,8 @@ import json
 import os
 from dataclasses import dataclass
 from typing import Any, Dict, Optional
+from pathlib import Path
+import re
 
 # Optional: you can integrate OpenAI or other providers here
 try:
@@ -25,7 +27,62 @@ except Exception:
     QdrantRetriever = None  # type: ignore
     QdrantConfig = None  # type: ignore
 
-PROMPT_PATH = os.path.join(os.path.dirname(__file__), "..", "simple_classifier_prompt.txt")
+# Point to the long, production prompt
+def _resolve_prompt_path() -> str:
+    """Resolve prompt path with these preferences:
+    1) PROMPT_PATH env var if set
+    2) prompts/ai_ticket_classifier_prompt.md
+    3) prompts/ai_ticket_classifier_prompt.txt
+    4) prompts/simple_classifier_prompt.txt
+    Returns a string path even if file does not exist (loader will handle fallback).
+    """
+    env_path = os.getenv("PROMPT_PATH")
+    if env_path:
+        return env_path
+    base = Path(__file__).resolve().parents[1] / "prompts"
+    for name in [
+        "ai_ticket_classifier_prompt.md",
+        "ai_ticket_classifier_prompt.txt",
+        "simple_classifier_prompt.txt",
+    ]:
+        p = base / name
+        if p.exists():
+            return str(p)
+    return str(base / "ai_ticket_classifier_prompt.md")
+
+PROMPT_PATH = _resolve_prompt_path()
+
+# Debug flag for verbose logging
+DEBUG = os.getenv("DEBUG_CLASSIFIER") == "1"
+
+
+def _extract_json_obj(text: str) -> Dict[str, Any]:
+    """Attempt to extract a JSON object from model output.
+    - Strips code fences if present
+    - Tries direct json.loads, then searches for first {...} block
+    - Prints raw output (truncated) when DEBUG is enabled
+    """
+    t = (text or "").strip()
+    # Strip code fences
+    if t.startswith("```"):
+        t = re.sub(r"^```[a-zA-Z0-9]*\s*", "", t)
+        t = re.sub(r"\s*```$", "", t)
+    # Direct parse
+    try:
+        return json.loads(t)
+    except Exception:
+        pass
+    # Find first JSON object
+    m = re.search(r"\{(?:[^{}]|(?R))*\}", t)
+    if m:
+        try:
+            return json.loads(m.group(0))
+        except Exception:
+            pass
+    if DEBUG:
+        print("RAW LLM OUTPUT (first 800 chars):")
+        print(t[:800])
+    raise ValueError("No valid JSON object found in LLM output")
 
 CATEGORIES = {
     "refund",
@@ -107,7 +164,7 @@ class LlmClassifier:
             raise RuntimeError("OPENAI_API_KEY env var is required for LlmClassifier")
         openai.api_key = api_key
         self.model = model
-        self.system_prompt = self._load_system_prompt()
+        self.system_prompt = self._load_system_prompt().strip() + "\n\nReturn ONLY a minified JSON object with keys: classification, confidence (0-100), reasoning. No prose."
 
     def _load_system_prompt(self) -> str:
         try:
@@ -124,13 +181,20 @@ class LlmClassifier:
         ]
         resp = openai.chat.completions.create(model=self.model, messages=messages, temperature=0)
         content = resp.choices[0].message.content or "{}"
+        if DEBUG:
+            print("\n=== LLM DEBUG ===")
+            print("Prompt path:", PROMPT_PATH)
+            print("System prompt (first 300):", self.system_prompt[:300].replace("\n", " "))
+            print("Subject:", subject)
+            print("Conversation length:", len(conversation))
+            print("Conversation (first 400):", conversation[:400])
+            print("Raw content (first 400):", content[:400])
         try:
-            data = json.loads(content)
+            data = _extract_json_obj(content)
             classification = data.get("classification", "miscellaneous")
             confidence = int(data.get("confidence", 60))
             reasoning = data.get("reasoning", "")
         except Exception:
-            # Fallback parse strategy
             classification = "miscellaneous"
             confidence = 60
             reasoning = "LLM output parsing fallback"
@@ -145,7 +209,7 @@ class VectorLlmClassifier:
         if QdrantRetriever is None or QdrantConfig is None:
             raise RuntimeError("Qdrant components not available. Ensure app.vector_store and qdrant-client are installed.")
         self.model = model
-        self.system_prompt = self._load_system_prompt()
+        self.system_prompt = self._load_system_prompt().strip() + "\n\nReturn ONLY a minified JSON object with keys: classification, confidence (0-100), reasoning. No prose."
         self.retriever = QdrantRetriever(QdrantConfig.from_env())
         self.top_k = top_k
 
@@ -175,8 +239,20 @@ class VectorLlmClassifier:
         ]
         resp = openai.chat.completions.create(model=self.model, messages=messages, temperature=0)
         content = resp.choices[0].message.content or "{}"
+        if DEBUG:
+            print("\n=== VECTOR LLM DEBUG ===")
+            print("Prompt path:", PROMPT_PATH)
+            print("System prompt (first 300):", self.system_prompt[:300].replace("\n", " "))
+            print("Subject:", subject)
+            print("Conversation length:", len(conversation))
+            print("Top-k docs:", len(docs))
+            for i, d in enumerate(docs, 1):
+                print(f"Doc {i} score={d.get('score')} tag={d.get('tag')}")
+                print("  Content (first 200):", (d.get("content") or "")[:200])
+            print("User content (first 400):", user_content[:400])
+            print("Raw content (first 400):", content[:400])
         try:
-            data = json.loads(content)
+            data = _extract_json_obj(content)
             classification = data.get("classification", "miscellaneous")
             confidence = int(data.get("confidence", 60))
             reasoning = data.get("reasoning", "")

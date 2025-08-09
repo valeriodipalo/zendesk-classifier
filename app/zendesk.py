@@ -91,6 +91,10 @@ class ZendeskClient:
                 continue
             conversation.append({"role": role, "message": text})
 
+        # If no public comments, fall back to description
+        if not conversation and description:
+            conversation.append({"role": "Customer", "message": description.strip()})
+
         subject = ticket.get("subject", "")
         return {"subject": subject, "conversation": conversation, "ticket": ticket}
 

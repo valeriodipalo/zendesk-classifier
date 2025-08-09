@@ -18,9 +18,7 @@ This repository contains:
   - `data_analysis.py` — analysis; reads from `data/`; writes to `outputs/`
   - `create_refined_taxonomy.py` — builds refined taxonomy from real examples; outputs saved to `outputs/`
 - `data/`
-  - Raw inputs (e.g., `taxonomy.csv`, `zendesk_tickets_*.json`)
-- `outputs/`
-  - Generated analysis artifacts and CSVs
+  - Raw inputs (e.g., `taxonomy.csv`, `zendesk_tickets_*.json`) and Generated analysis artifacts and CSVs
 - `prompts/` (optional)
   - `simple_classifier_prompt.txt` — LLM production prompt
 - `docs/` (optional)
