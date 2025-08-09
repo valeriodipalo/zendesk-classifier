@@ -5,7 +5,6 @@ import os
 import traceback
 from pathlib import Path
 from datetime import datetime, timezone, timedelta
-import csv
 
 # Ensure local imports work in serverless env
 ROOT = Path(__file__).resolve().parents[1]
@@ -61,73 +60,55 @@ def recent_classification_exists(client: ZendeskClient, ticket_id: int, window_m
 
 
 def load_response_mapping() -> dict:
-    """Load category->response text mapping from CSV.
-    Order of precedence (first that exists wins):
-      1) RESPONSE_MAP_PATH env
-      2) DATA/Ticket_map.csv   (user-provided mapping)
-      3) data/Ticket_map.csv
-      4) ricket_map.csv (legacy name) under data/ or root
-      5) data/response_templates.csv (fallback conventional name)
-    CSV may be headered (category,response_text) or headerless.
-    Delimiter is auto-detected among [; , \t |].
+    """Load category -> response_text mapping from JSON only.
+    Priority (first existing wins):
+      1) RESPONSE_MAP_JSON (absolute path)
+      2) data/response_templates.json
+      3) DATA/response_templates.json
+    JSON formats accepted:
+      - Object { "refund": "text...", "regeneration": "text..." }
+      - Array of objects [ {"category":"refund","response_text":"text..."}, ... ]
+    Keys normalized to lowercase.
     """
     candidates = []
-    env_path = os.getenv("RESPONSE_MAP_PATH")
-    if env_path:
-        candidates.append(Path(env_path))
-    base = ROOT
+    env_json = os.getenv("RESPONSE_MAP_JSON")
+    if env_json:
+        candidates.append(Path(env_json))
     candidates += [
-        base / "DATA" / "Ticket_map.csv",
-        base / "data" / "Ticket_map.csv",
-        base / "data" / "ricket_map.csv",
-        base / "ricket_map.csv",
-        base / "data" / "response_templates.csv",
+        ROOT / "data" / "response_templates.json",
+        ROOT / "DATA" / "response_templates.json",
     ]
-
-    def detect_delimiter(sample: str) -> str:
-        for d in [";", ",", "\t", "|"]:
-            if d in sample:
-                return d
-        return ","
 
     for p in candidates:
         try:
             if not p.exists():
                 continue
+            with p.open("r", encoding="utf-8-sig") as f:
+                data = json.load(f)
             mapping = {}
-            with p.open("r", encoding="utf-8-sig", newline="") as f:
-                head = f.read(2048)
-                f.seek(0)
-                delim = detect_delimiter(head)
-                # Try with DictReader first
-                reader = csv.DictReader(f, delimiter=delim)
-                fieldnames = [fn.strip().lower() for fn in (reader.fieldnames or [])]
-                if "category" in fieldnames and ("response_text" in fieldnames or "response" in fieldnames):
-                    resp_key = "response_text" if "response_text" in fieldnames else "response"
-                    for row in reader:
-                        cat = (row.get("category") or "").strip().lower()
-                        txt = (row.get(resp_key) or "").strip()
-                        if cat and txt:
-                            mapping[cat] = txt
-                else:
-                    # Headerless: use csv.reader and take first two columns
-                    f.seek(0)
-                    r2 = csv.reader(f, delimiter=delim)
-                    for row in r2:
-                        if not row or len(row) < 2:
-                            continue
-                        cat = (row[0] or "").strip().lower()
-                        txt = (row[1] or "").strip()
-                        if cat and txt and cat != "category":
-                            mapping[cat] = txt
+            if isinstance(data, dict):
+                for k, v in data.items():
+                    k2 = (k or "").strip().lower()
+                    v2 = (v or "").strip()
+                    if k2 and v2:
+                        mapping[k2] = v2
+            elif isinstance(data, list):
+                for row in data:
+                    if not isinstance(row, dict):
+                        continue
+                    k2 = (row.get("category") or "").strip().lower()
+                    v2 = (row.get("response_text") or row.get("response") or "").strip()
+                    if k2 and v2:
+                        mapping[k2] = v2
             if DEBUG:
-                print(f"Loaded response map from: {p} (entries={len(mapping)}) delimiter='{delim}'")
-            return mapping
+                print(f"Loaded JSON response map from: {p} (entries={len(mapping)})")
+            if mapping:
+                return mapping
         except Exception as e:
             if DEBUG:
-                print(f"Failed loading mapping from {p}: {e}")
+                print(f"Failed loading JSON mapping from {p}: {e}")
     if DEBUG:
-        print("No response mapping found; will skip answer comment")
+        print("No JSON response mapping found; will skip answer comment")
     return {}
 
 
@@ -189,7 +170,7 @@ class handler(BaseHTTPRequestHandler):
             })
             client.add_private_comment(int(ticket_id), class_body)
 
-            # Load mapping and post the mapped internal answer (private) if available
+            # Load JSON mapping and post the mapped internal answer (private) if available
             mapping = load_response_mapping()
             answer = mapping.get((result.classification or "").lower())
             if answer:
