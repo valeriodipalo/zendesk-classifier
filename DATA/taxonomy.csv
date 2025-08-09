@@ -1,0 +1,226 @@
+﻿Title,Description,Notion Page,Message,Mechanics
+https://aisuitupsupport.zendesk.com/agent/search/1?type=ticket&q=tags%3Afeedback,Customer wants to provide feedback,,,
+refund,Customer requests a refund as is intentioned to absoluetely get a refund. See sub-categories,"Refund Form  (https://www.notion.so/Refund-Form-1ad11060e82080d8ac62d1b8a5ef53a2?pvs=21) ","Hi,
+We are sorry to hear that the quality of the pictures does not meet your expectations.
+To request your refund, please fill out this short form: https://form.typeform.com/to/HtFxtWZ2
+
+Upon receipt of the form, our team will investigate your request and determine your eligibility for a refund. You will receive a response within 1-2 business days.
+
+Please refer to our refund policy for any doubt: https://www.aisuitup.com/refund-policy
+
+Best,
+AI SuitUp Team",
+refund-form (OPERATIONS),"When a person opens a refund link it will be tagged as refund form ","Refund Issued + Review Ask (Google)  (https://www.notion.so/Refund-Issued-Review-Ask-Google-1bb11060e82080dcb90bd099522c57d3?pvs=21) ","We’re sorry to hear that your generation didn’t turn out as expected. As part of our 100% Money-Back Guarantee, we have processed a full refund for your recent purchase. You can expect the funds to be credited to your original payment method within 5-10 business days.
+If there’s anything else we can do for you, please don’t hesitate to reach out.
+Best regards,
+The AI SuitUp Team",15pics -people who ask refund because they can’t upload 15 pictures
+https://aisuitupsupport.zendesk.com/agent/search/1?type=ticket&q=tags%3Aregeneration,"Customer requests a re-generation with different parameters, e.g. my hair are red, I'm too skinny, etc. See sub-categories.","Dashboard re-generation  (https://www.notion.so/Dashboard-re-generation-1dc11060e82080a3944dda3295853794?pvs=21) ","Hi [NAME],
+We've just initiated a regeneration with the updated adjustments, and your new set should arrive in your inbox within the next hour. We hope you'll love the changes and want to ensure you have the best possible experience.
+We look forward to hearing your feedback on this latest batch.
+Best regards,
+Valerio
+AI SuitUp Team","-LOOP TAG- 
+when the loop tag is added means we are checking how extra works. going in the dashboard you will find the custom regen. 
+
+THIS IS TO TEST NEW THINGS - INFO IN THE INTERNAL NOTE"
+"regen-info ","This contains the specific feedback from customer for rigen ",,"Hi [First Name],
+Thank you for letting us know that your first headshot set wasn’t quite what you had in mind. We’re eager to make things right! To guide our next custom generation, could you tell us exactly what you’d like tweaked?
+Please include only the aspects you’d like refined:
+
+• Body type:
+(e.g., slim, athletic, curvy)
+• Hair style & length:
+(e.g., shoulder‑length waves, pixie cut, close‑cropped fade)
+• Hair color:
+(e.g. blonde, brunette, etc.) 
+• Other:
+(e.g. any other characteristics you would like to refine) 
+
+Feel free to leave a line blank if you’re happy with that element. 
+Thanks for taking the time to share these details. Once we receive your notes, we’ll generate a new set tailored to your vision.
+
+Warm regards,
+Valerio
+AI SuitUp",
+spam,"Customer generation is stuck, pictures have not been received after X hours. caused by customer not checking their spam folder","NOTE-CANT DO THIS CLASSIFICATION WITHOUT ACCESS TO DASHBOARD ","Hi there,
+Your AI-generated headshots are ready — you can access them directly using the link below:
+👉 [CODE]
+
+Sometimes the email with your results might land in your spam or promotions folder, so feel free to check there as well. But no worries — this link will take you straight to your gallery.
+
+We hope you love the results! If you have any questions or run into any issues, just reach out — we’re always happy to help and want to make sure you have the best possible experience.
+
+Warm regards,
+Valerio
+AI SuitUp",
+wrong-email,,,"Hi there,
+Your AI-generated headshots are ready — you can access them directly using the link below:
+👉 [CODE]
+
+We hope you love the results! If you have any questions or run into any issues, just reach out — we’re always happy to help and want to make sure you have the best possible experience.
+
+Warm regards,
+Valerio
+AI SuitUp",
+reupload,Customer asks for the possibility to reupload different pictures to get better results,,"Hi [NAME],
+
+No worries — you can easily start a new generation here:
+👉 [CODE]
+
+To get the best results, make sure to follow our photo upload guidelines when selecting your pictures, you can read more about them here: https://www.aisuitup.com/guidelines
+
+To ensure the best results we recommend:
+• Upload 3 pictures on a white background: one smiling, one looking professional and one with a slight head tilt
+• Upload 3 pictures standing in front of a window: one smiling, one looking professional and one with a slight head tilt
+• Upload 3 pictures standing in front of an outside background: one smiling, one looking professional and one with a slight head tilt
+
+Thanks again for giving us the opportunity to deliver a better experience — we’re excited to see your new results!
+
+Warm regards,
+Valerio
+AI SuitUp
+",
+ghost-email,The customer contacts us but no info is avaialble on him her in stripe or dashboard,,"Hi [name],
+We’ve checked our system, and there doesn’t appear to be any generation or payment associated with the email you provided. Could you kindly double-check for any typos in the email address? Alternatively, if you have the order ID or a copy of the payment receipt, please share it with us. We’ll do our best to resolve this as smoothly as possible.
+Best regards,
+Valerio
+AI SuitUp",
+https://aisuitupsupport.zendesk.com/agent/search/1?type=ticket&q=tags%3Ainvoice,Customer requests an invoice,"Receipt  (https://www.notion.so/Receipt-1b611060e8208053898addf7408c7da0?pvs=21) ","Hi [NAME],
+Your receipt should have arrived in your inbox right now, feel free to reach out if you need anything else!
+If you’re happy with your AI headshots and the customer support, we’d truly appreciate a quick 5-star review. It helps us grow and lets others know about AI SuitUp.
+It only takes a minute:
+👉 https://tinyurl.com/AISuitUp
+Thanks so much for your support, it really means the world to us!
+Best,
+Valerio
+AI Suitup",
+"Google review (OPERATIONS) ",Ask the customer a review <3,"Ask review  (https://www.notion.so/Ask-review-1bb11060e820803e8158f1ace553412c?pvs=21) ","If you had a positive experience with AI SuitUp and our customer support, we’d love for you to share your thoughts in a Google review. Your feedback not only helps us improve but also allows us to reach more people looking for high-quality AI-generated headshots.
+Leaving a 5-star review is quick and easy, all you will need to do is click this link: https://g.page/r/CWTeEcuITuXBEBM/review and share your experience.
+Your support would mean the world to us!
+
+Your support would mean the world to us!
+Valerio 
+Co-Founder AI SuitUp 
+",
+Trustpilot review,Ask a customer a review <3,,"If you had a positive experience with AI SuitUp and our customer support, we’d love for you to share your thoughts on TrustPlito. Your feedback not only helps us improve but also allows us to reach more people looking for high-quality AI-generated headshots.
+Leaving a 5-star review is quick and easy, all you will need to do is click this link: https://www.trustpilot.com/evaluate/aisuitup.com and share your experience.
+
+Your support would mean the world to us!
+Valerio 
+Co-Founder AI SuitUp 
+",
+request-edit,"Customer requests for custom edits (we will not do them)  ",,"Hi [NAME],
+Thank you so much for sharing your thoughts!
+While we typically don’t offer manual editing, I’ve gone ahead and launched a brand-new generation for you, completely on us! This will give you a fresh set of options with even more variety to choose from.
+You can expect the new results within the next hour, and we truly hope they hit the mark for you. We're committed to making sure your experience with us is exceptional from start to finish.
+If there’s anything else you need or if you'd like to share more feedback, I’m here and happy to help!
+Warm regards,
+Valerio
+AI SuitUp Team",
+https://aisuitupsupport.zendesk.com/agent/search/1?type=ticket&q=tags%3Ainfluencers,Customer wants to sponsor AI SuitUp on their profiles,,"Hi [NAME],
+Our collaboration model is designed to be simple and performance-based. We offer a 25% affiliate commission through our referral program, which you can learn more about here: https://www.aisuitup.com/earn-with-us.
+This acts as a starting point, if we see promising traction—typically 20+ conversions—we’re happy to explore extended partnerships with additional incentives and custom campaign opportunities.
+Let me know if this sounds interesting, and we’d be glad to get you set up.
+Best regards,
+Valerio
+AI SuitUp",
+https://aisuitupsupport.zendesk.com/agent/search/1?type=ticket&q=tags%3Alinkedin,Customer has shared their pictures on LinkedIn and wants a re-generation,,"Hi [NOME],
+Thank you so much for your support—we truly appreciate you sharing your AI SuitUp photo on LinkedIn!
+As promised, here’s your free headshot generation link:
+👉 [COUPON]
+Feel free to use it for yourself, or gift it to a friend, colleague, or loved one who might enjoy a professional AI headshot. It’s our way of saying thanks and helping more people put their best face forward online.
+If you enjoyed your experience with AI SuitUp, we’d be incredibly grateful if you could leave us a quick 5-star review. Your feedback helps others feel confident in choosing us too!
+It only takes a minute:
+✅ https://www.trustpilot.com/evaluate/aisuitup.com
+Thanks again—your support truly means the world to us. And of course, if there’s anything you need, I’m just a message away.
+Warm regards,
+Valerio
+AI SuitUp",
+https://aisuitupsupport.zendesk.com/agent/search/1?type=ticket&q=tags%3Adouble-pay,Customer has paid two times and wants a refund,,"Hi there, 
+we have processed your request for doiuble payment and  a full refund for your most recent purchase. You can expect the funds to be credited to your original payment method within 5-10 business days.
+If there’s anything else we can do for you, please don’t hesitate to reach out.
+Best regards,
+The AI SuitUp Team",
+https://aisuitupsupport.zendesk.com/agent/search/1?type=ticket&q=tags%3Ablocked-generation (OUTDATED: Ogni codice deve avere una risposta univoca),"Customer generation is stuck, pictures have not been received after X hours. This can be caused by a blocked generation or customer not checking their spam folder",,,https://www.loom.com/share/e10a40ffc7d64af6ac214194bb128cef?sid=0c104f9b-a97e-4e98-82b7-cf7932cb8290
+"blocked-generation / blocked ","Customer generation is stuck, pictures have not been received after X hours. caused by a blocked generation",,"Hi there,
+Thank you so much for reaching out, and I sincerely apologize for the delay in delivering your headshots. A technical issue occurred during the generation process, which unfortunately prevented it from completing properly. We understand how frustrating this must be.
+Our team is actively investigating the issue, and you can expect an update within one business day. We’ll make sure your headshots are delivered to your email as soon as possible.
+
+Thank you again for your patience—we’re committed to making this right.
+Warm regards,
+Valerio
+AI SuitUp",
+cannot-access,Customer has lost access to the account/has lost the access to the upload,,,
+other,ALL OTHER CASES,,,
+"app-bug ",to use in association with refund when the app is not working,,,
+sppam,,"Spam email in inbox ",,
+team-coupon (Ex team),,,"Hello [Name],
+As a next step, here is your personalized access code to try out our demo and experience firsthand how the AI headshot creation works:
+You can use this link to get started: 
+[LINK] 
+This demo is a great way to explore the quality and ease of our technology before we move on to generating the full set of team headshots for you
+If you have any questions or specific preferences for your team's style, feel free to share them — I'm here to assist every step of the way.
+Looking forward to hearing your thoughts once you’ve had a chance to explore!
+Warm regards,
+
+Valerio 
+AI SuitUp",
+team-info,,,"Hi,
+
+our AI SuitUp Teams solution is designed to help organizations create professional, studio-quality headshots for their entire team effortlessly. With Teams, you can:
+
+✅ Generate consistent, branded headshots that align with your company’s image.
+✅ Upload photos in bulk and manage everything from a central dashboard.
+✅ Offer each team member a smooth experience with guided photo tips and easy access.
+✅ Save time and resources compared to traditional photo shoots.
+
+It’s ideal for updating websites, LinkedIn profiles, and marketing materials quickly and professionally.
+
+You can read more at: https://www.aisuitup.com/teams
+
+If you’d like, I can share more details or help you get set up with a demo to explore how it could work for your team.
+
+Just let me know!",
+team-info,,,"Hi there, you can try our team solution by filling our form: https://form.typeform.com/to/JW1RCBHK?typeform-source=www.aisuitup.com#team_members=xxxxx",
+BKG removal,,,"Hi there,
+ 
+You can easily update the background using our free tool right here: https://www.aisuitup.com/free-linkedin-photo-generator. It lets you remove and replace the background in just a few clicks, giving you more control to create the look you’re aiming for.
+ 
+If you have any questions while using it, feel free to reach out — I’m here to help!
+ 
+Warm regards,
+Valerio 
+AI SuitUp",
+"refund not arrived ",,,"Dear [Customer Name],
+
+I’m happy to confirm that your refund was successfully issued on [Refund Date]. However, please be aware that depending on your bank’s processing times, it can take a few business days for the funds to appear in your account.
+
+To help you track the refund with your bank, here is the transaction reference code (ARN): [ARN Code]. You can provide this code to your bank’s support team — they will be able to trace the transaction and give you more details on its current status.
+
+We truly appreciate your patience as this process completes. If you have any further questions or need any assistance, please don’t hesitate to reach out. We're here to help!
+
+Warm regards,
+Valerio ",
+expired,,,"Hi [Name],
+No worries at all, we’ve got you covered!
+To make sure you don’t miss out on your polished, professional AI headshots, here’s a fresh new code you can use right away:
+LOOKSMART10 — just enter it at checkout for 10% off.
+If there’s anything we can do to make the experience even better, just hit reply. We’re always here to help you look your best.
+Warm regards,
+Valerio
+AI SuitUp Team",
+"case study ",,"Ask team customer to compile some info for a case study ","Hi [Customer's Name],
+
+I hope you're doing great!
+
+I wanted to reach out and ask if you'd be open to being featured in a short case study on our blog. You've been using our team platform, and we think your story could really inspire others looking for a similar solution.
+
+To make it super easy, we’ve prepared a short doc with a few questions you can answer at your convenience. If you'd prefer a quick call instead, I'm more than happy to schedule one and handle the writing myself—you’d just have to review and approve the final version.
+
+Here’s the link to the case study questions: https://docs.google.com/document/d/1dJgSYW2EQPYKYFc_qgDXO81XWHP7xOUjVgwx6B5Tkgo/edit?tab=t.rs7q3lvc2mr7 {LINK TO TEMPLATE} 
+
+No pressure at all, and thank you either way for being part of our journey!
+Best,
+Valerio
+Co-Founder, AI SuitUp
+🗓️ Book a call: https://cal.com/valerio-di-palo-pq7wl8/30min",

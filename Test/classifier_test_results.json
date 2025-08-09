@@ -1,0 +1,320 @@
+{
+  "summary": {
+    "total": 33,
+    "correct": 13,
+    "high_confidence_correct": 12,
+    "high_confidence_total": 19,
+    "category_performance": {
+      "refund": {
+        "total": 3,
+        "correct": 2
+      },
+      "regeneration": {
+        "total": 3,
+        "correct": 0
+      },
+      "sppam": {
+        "total": 3,
+        "correct": 0
+      },
+      "pictures-not-received-spam": {
+        "total": 3,
+        "correct": 1
+      },
+      "invoice": {
+        "total": 3,
+        "correct": 2
+      },
+      "reupload": {
+        "total": 3,
+        "correct": 0
+      },
+      "influencers": {
+        "total": 3,
+        "correct": 3
+      },
+      "team-info": {
+        "total": 3,
+        "correct": 2
+      },
+      "feedback": {
+        "total": 3,
+        "correct": 1
+      },
+      "ghost-email": {
+        "total": 3,
+        "correct": 0
+      },
+      "linkedin": {
+        "total": 3,
+        "correct": 2
+      }
+    }
+  },
+  "detailed_results": [
+    {
+      "expected": "refund",
+      "predicted": "refund",
+      "confidence": 90,
+      "correct": true,
+      "subject": "Re: [Ai SuitUp] Your AI Generated Headshots Are Re...",
+      "reasoning": "Refund keywords detected"
+    },
+    {
+      "expected": "refund",
+      "predicted": "refund",
+      "confidence": 90,
+      "correct": true,
+      "subject": "Refund",
+      "reasoning": "Refund keywords detected"
+    },
+    {
+      "expected": "refund",
+      "predicted": "miscellaneous",
+      "confidence": 40,
+      "correct": false,
+      "subject": "Re: [Ai SuitUp] Your AI Generated Headshots Are Re...",
+      "reasoning": "No clear category match"
+    },
+    {
+      "expected": "regeneration",
+      "predicted": "miscellaneous",
+      "confidence": 40,
+      "correct": false,
+      "subject": "Re: [Ai SuitUp] Your AI Generated Headshots Are Re...",
+      "reasoning": "No clear category match"
+    },
+    {
+      "expected": "regeneration",
+      "predicted": "team-info",
+      "confidence": 80,
+      "correct": false,
+      "subject": "Re: [Ai SuitUp] Your AI Generated Headshots Are Re...",
+      "reasoning": "Team/enterprise inquiry"
+    },
+    {
+      "expected": "regeneration",
+      "predicted": "refund",
+      "confidence": 90,
+      "correct": false,
+      "subject": "RE: [Ai SuitUp] Your AI Generated Headshots Are Re...",
+      "reasoning": "Refund keywords detected"
+    },
+    {
+      "expected": "sppam",
+      "predicted": "miscellaneous",
+      "confidence": 40,
+      "correct": false,
+      "subject": "Re: Reliable Partner?",
+      "reasoning": "No clear category match"
+    },
+    {
+      "expected": "sppam",
+      "predicted": "miscellaneous",
+      "confidence": 40,
+      "correct": false,
+      "subject": "Re: What\u2019s site efficiency?",
+      "reasoning": "No clear category match"
+    },
+    {
+      "expected": "sppam",
+      "predicted": "miscellaneous",
+      "confidence": 40,
+      "correct": false,
+      "subject": "I need a Paid Post with permanent do follow link a...",
+      "reasoning": "No clear category match"
+    },
+    {
+      "expected": "pictures-not-received-spam",
+      "predicted": "pictures-not-received-spam",
+      "confidence": 88,
+      "correct": true,
+      "subject": "Headshots - never received",
+      "reasoning": "Photos not received"
+    },
+    {
+      "expected": "pictures-not-received-spam",
+      "predicted": "miscellaneous",
+      "confidence": 40,
+      "correct": false,
+      "subject": "ISSUE",
+      "reasoning": "No clear category match"
+    },
+    {
+      "expected": "pictures-not-received-spam",
+      "predicted": "linkedin",
+      "confidence": 90,
+      "correct": false,
+      "subject": "Headshot delay?",
+      "reasoning": "LinkedIn sharing request"
+    },
+    {
+      "expected": "invoice",
+      "predicted": "invoice",
+      "confidence": 92,
+      "correct": true,
+      "subject": "Receipt from Recent Order",
+      "reasoning": "Invoice request detected"
+    },
+    {
+      "expected": "invoice",
+      "predicted": "miscellaneous",
+      "confidence": 40,
+      "correct": false,
+      "subject": "RE: [External] [Ai SuitUp] Your payment has been r...",
+      "reasoning": "No clear category match"
+    },
+    {
+      "expected": "invoice",
+      "predicted": "invoice",
+      "confidence": 92,
+      "correct": true,
+      "subject": "Fw: [Ai SuitUp] Your payment has been received",
+      "reasoning": "Invoice request detected"
+    },
+    {
+      "expected": "reupload",
+      "predicted": "refund",
+      "confidence": 90,
+      "correct": false,
+      "subject": "AW: [Ai SuitUp] Your AI Generated Headshots Are Re...",
+      "reasoning": "Refund keywords detected"
+    },
+    {
+      "expected": "reupload",
+      "predicted": "miscellaneous",
+      "confidence": 40,
+      "correct": false,
+      "subject": "No likeness in pictures",
+      "reasoning": "No clear category match"
+    },
+    {
+      "expected": "reupload",
+      "predicted": "team-info",
+      "confidence": 80,
+      "correct": false,
+      "subject": "Re: [Ai SuitUp] Your payment has been received",
+      "reasoning": "Team/enterprise inquiry"
+    },
+    {
+      "expected": "influencers",
+      "predicted": "influencers",
+      "confidence": 80,
+      "correct": true,
+      "subject": "For Twitter and LinkedIn collaboration",
+      "reasoning": "Influencer collaboration"
+    },
+    {
+      "expected": "influencers",
+      "predicted": "influencers",
+      "confidence": 80,
+      "correct": true,
+      "subject": "Media Request",
+      "reasoning": "Influencer collaboration"
+    },
+    {
+      "expected": "influencers",
+      "predicted": "influencers",
+      "confidence": 80,
+      "correct": true,
+      "subject": "Collaboration",
+      "reasoning": "Influencer collaboration"
+    },
+    {
+      "expected": "team-info",
+      "predicted": "miscellaneous",
+      "confidence": 40,
+      "correct": false,
+      "subject": "Bank of New York Conference",
+      "reasoning": "No clear category match"
+    },
+    {
+      "expected": "team-info",
+      "predicted": "team-info",
+      "confidence": 80,
+      "correct": true,
+      "subject": "Enterprise Team Request",
+      "reasoning": "Team/enterprise inquiry"
+    },
+    {
+      "expected": "team-info",
+      "predicted": "team-info",
+      "confidence": 80,
+      "correct": true,
+      "subject": "Enterprise Team Request",
+      "reasoning": "Team/enterprise inquiry"
+    },
+    {
+      "expected": "feedback",
+      "predicted": "feedback",
+      "confidence": 75,
+      "correct": true,
+      "subject": "Re: [Ai SuitUp] How did we do?",
+      "reasoning": "Customer feedback"
+    },
+    {
+      "expected": "feedback",
+      "predicted": "miscellaneous",
+      "confidence": 40,
+      "correct": false,
+      "subject": "Re: [Ai SuitUp] Your AI Generated Headshots Are Re...",
+      "reasoning": "No clear category match"
+    },
+    {
+      "expected": "feedback",
+      "predicted": "miscellaneous",
+      "confidence": 40,
+      "correct": false,
+      "subject": "Re: [Ai SuitUp] Re: Re: [Ai SuitUp] Your AI Genera...",
+      "reasoning": "No clear category match"
+    },
+    {
+      "expected": "ghost-email",
+      "predicted": "invoice",
+      "confidence": 92,
+      "correct": false,
+      "subject": "Project 866915498104",
+      "reasoning": "Invoice request detected"
+    },
+    {
+      "expected": "ghost-email",
+      "predicted": "refund",
+      "confidence": 90,
+      "correct": false,
+      "subject": "I want a refund.  I uploaded 6 photos and then pai...",
+      "reasoning": "Refund keywords detected"
+    },
+    {
+      "expected": "ghost-email",
+      "predicted": "miscellaneous",
+      "confidence": 40,
+      "correct": false,
+      "subject": "Re: [Ai SuitUp] Re: Missing headshots",
+      "reasoning": "No clear category match"
+    },
+    {
+      "expected": "linkedin",
+      "predicted": "miscellaneous",
+      "confidence": 40,
+      "correct": false,
+      "subject": "share on Indeed.com",
+      "reasoning": "No clear category match"
+    },
+    {
+      "expected": "linkedin",
+      "predicted": "linkedin",
+      "confidence": 90,
+      "correct": true,
+      "subject": "Free Generation",
+      "reasoning": "LinkedIn sharing request"
+    },
+    {
+      "expected": "linkedin",
+      "predicted": "linkedin",
+      "confidence": 90,
+      "correct": true,
+      "subject": "I shared on LinkedIn",
+      "reasoning": "LinkedIn sharing request"
+    }
+  ]
+}

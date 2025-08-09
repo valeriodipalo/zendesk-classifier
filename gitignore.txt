@@ -1,0 +1,11 @@
+# Copy to .gitignore in your repo root
+# Python
+__pycache__/
+*.pyc
+
+# Env files (do NOT commit real secrets)
+.env
+app/.env
+
+# OS
+.DS_Store 

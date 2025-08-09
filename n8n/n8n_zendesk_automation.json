@@ -1,0 +1,753 @@
+{
+  "name": "Zendesk automation",
+  "nodes": [
+    {
+      "parameters": {
+        "httpMethod": "POST",
+        "path": "d23a220e-ec4f-4fac-8824-786723ec6081",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.webhook",
+      "typeVersion": 2,
+      "position": [
+        -1840,
+        660
+      ],
+      "id": "b91dd1e9-cb38-4eb0-8e15-e2a574ff70e6",
+      "name": "Webhook",
+      "webhookId": "d23a220e-ec4f-4fac-8824-786723ec6081"
+    },
+    {
+      "parameters": {
+        "jsCode": "const subject = $('HTTP Request3').first().json.ticket.subject;\nconst comments = $input.first().json.comments;\nconst supportStaffId = 25419196369051;\n\n// Filter out internal notes (public: false)\nconst publicComments = comments.filter(comment => comment.public);\n\n// Check if first public comment matches the description (skip if so)\nconst firstPublicComment = publicComments[0];\nconst description = $('HTTP Request3').first().json.ticket.description;\nconst isDuplicate = firstPublicComment && firstPublicComment.plain_body?.trim() === description.trim();\n\n// Build conversation\nconst conversation = [];\n\nfor (let i = 0; i < publicComments.length; i++) {\n  const comment = publicComments[i];\n  \n  // Skip first comment if it's a duplicate of the description\n  if (i === 0 && isDuplicate) continue;\n\n  const role = comment.author_id === supportStaffId ? 'Support Staff' : 'Customer';\n  conversation.push({\n    role,\n    message: comment.plain_body?.trim()\n  });\n}\n\nreturn [\n  {\n    json: {\n      subject,\n      conversation\n    }\n  }\n];\n"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        -1180,
+        660
+      ],
+      "id": "0aea36bc-1aac-4cfb-b4bf-4b6a20ea6d75",
+      "name": "Process Entire Ticket"
+    },
+    {
+      "parameters": {
+        "url": "=https://aisuitupsupport.zendesk.com/api/v2/tickets/{{ $json.body.ticket.id}}/comments",
+        "authentication": "predefinedCredentialType",
+        "nodeCredentialType": "zendeskApi",
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [
+            {
+              "name": "Content-Type",
+              "value": "application/json"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        -1400,
+        660
+      ],
+      "id": "058a8d5b-1874-4850-ae8f-e22bd4a2a38d",
+      "name": "HTTP Request2",
+      "credentials": {
+        "zendeskApi": {
+          "id": "ZzJLmuPMEpxHFGiK",
+          "name": "Zendesk account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "url": "=https://aisuitupsupport.zendesk.com/api/v2/tickets/{{ $json.body.ticket_id}}\n",
+        "authentication": "predefinedCredentialType",
+        "nodeCredentialType": "zendeskApi",
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [
+            {
+              "name": "Content-Type",
+              "value": "application/json"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        -1620,
+        660
+      ],
+      "id": "64027d20-9b7a-4fe2-bc55-430b59eafde7",
+      "name": "HTTP Request3",
+      "credentials": {
+        "zendeskApi": {
+          "id": "ZzJLmuPMEpxHFGiK",
+          "name": "Zendesk account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "jsCode": "const data = $input.item.json;\n\nconst subject = data.subject;\nconst conversation = data.conversation;\n\nlet ticketInfo = `## Subject: ${subject}\\n\\n`;\n\nfor (const item of conversation) {\n  ticketInfo += `**${item.role}:**\\n${item.message}\\n\\n---\\n\\n`;\n}\n\nreturn [\n  {\n    json: {\n      ticketInfo\n    }\n  }\n];\n"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        -960,
+        660
+      ],
+      "id": "43d529d5-dd7b-4c30-b3ef-1fdffe0d2628",
+      "name": "Flatten"
+    },
+    {
+      "parameters": {
+        "rules": {
+          "values": [
+            {
+              "conditions": {
+                "options": {
+                  "caseSensitive": true,
+                  "leftValue": "",
+                  "typeValidation": "strict",
+                  "version": 2
+                },
+                "conditions": [
+                  {
+                    "leftValue": "={{ $('HTTP Request3').item.json.ticket.status }}",
+                    "rightValue": "open",
+                    "operator": {
+                      "type": "string",
+                      "operation": "equals"
+                    },
+                    "id": "61b5f100-291e-498b-b6d4-501f3d09f66f"
+                  }
+                ],
+                "combinator": "and"
+              },
+              "renameOutput": true,
+              "outputKey": "Open Ticket"
+            },
+            {
+              "conditions": {
+                "options": {
+                  "caseSensitive": true,
+                  "leftValue": "",
+                  "typeValidation": "strict",
+                  "version": 2
+                },
+                "conditions": [
+                  {
+                    "id": "7aa16296-0c6d-476e-a00a-8364b0df0ded",
+                    "leftValue": "={{ $('HTTP Request3').item.json.ticket.status }}",
+                    "rightValue": "solved",
+                    "operator": {
+                      "type": "string",
+                      "operation": "equals",
+                      "name": "filter.operator.equals"
+                    }
+                  }
+                ],
+                "combinator": "and"
+              },
+              "renameOutput": true,
+              "outputKey": "Solved Ticket"
+            },
+            {
+              "conditions": {
+                "options": {
+                  "caseSensitive": true,
+                  "leftValue": "",
+                  "typeValidation": "strict",
+                  "version": 2
+                },
+                "conditions": [
+                  {
+                    "id": "a9290979-db61-4245-86af-eefab9b52c47",
+                    "leftValue": "={{ $('HTTP Request3').item.json.ticket.status }}",
+                    "rightValue": "new",
+                    "operator": {
+                      "type": "string",
+                      "operation": "equals",
+                      "name": "filter.operator.equals"
+                    }
+                  }
+                ],
+                "combinator": "and"
+              },
+              "renameOutput": true,
+              "outputKey": "New Ticket"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.switch",
+      "typeVersion": 3.2,
+      "position": [
+        -740,
+        660
+      ],
+      "id": "5dfcdfda-1a6e-40a2-8a6d-8ceb079af51f",
+      "name": "Switch"
+    },
+    {
+      "parameters": {
+        "model": {
+          "__rl": true,
+          "value": "gpt-4.1",
+          "mode": "list",
+          "cachedResultName": "gpt-4.1"
+        },
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.lmChatOpenAi",
+      "typeVersion": 1.2,
+      "position": [
+        -480,
+        580
+      ],
+      "id": "8283e19e-c5d2-4224-b6ba-11ea4963c542",
+      "name": "OpenAI Chat Model",
+      "credentials": {
+        "openAiApi": {
+          "id": "30kBnjLv7t9OTeMm",
+          "name": "OpenAi account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "method": "PUT",
+        "url": "=https://aisuitupsupport.zendesk.com/api/v2/tickets/{{ $('Webhook').item.json.body.ticket_id }}",
+        "authentication": "predefinedCredentialType",
+        "nodeCredentialType": "zendeskApi",
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [
+            {
+              "name": "Content-Type",
+              "value": "application/json"
+            }
+          ]
+        },
+        "sendBody": true,
+        "specifyBody": "json",
+        "jsonBody": "={{ JSON.stringify($json) }}",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        140,
+        360
+      ],
+      "id": "ab867044-f490-4c6c-a546-c228c818739a",
+      "name": "HTTP Request1",
+      "credentials": {
+        "zendeskApi": {
+          "id": "ZzJLmuPMEpxHFGiK",
+          "name": "Zendesk account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "jsCode": "// Get the stringified JSON from the input\nconst rawOutput = items[0].json.output;\n\n// Parse the string into a plain JavaScript object\nconst parsed = JSON.parse(rawOutput);\n\n// Ensure it's a plain object, not wrapped in extra keys or arrays\nif (typeof parsed !== 'object' || Array.isArray(parsed)) {\n  throw new Error('Parsed JSON must be a plain object');\n}\n\n// Return the parsed object so it can be used as-is in an HTTP Request\nreturn [\n  {\n    json: parsed\n  }\n];\n"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        -80,
+        360
+      ],
+      "id": "8c2a1c18-a5f0-46cc-bbb2-f5ba39822b47",
+      "name": "Code"
+    },
+    {
+      "parameters": {
+        "model": {
+          "__rl": true,
+          "value": "gpt-4.1",
+          "mode": "list",
+          "cachedResultName": "gpt-4.1"
+        },
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.lmChatOpenAi",
+      "typeVersion": 1.2,
+      "position": [
+        -540,
+        1080
+      ],
+      "id": "06e83993-62b8-4960-acd6-a288e9cd7080",
+      "name": "OpenAI Chat Model1",
+      "disabled": true
+    },
+    {
+      "parameters": {
+        "promptType": "define",
+        "text": "={{ $json.ticketInfo }}",
+        "options": {
+          "systemMessage": "You are an AI SuitUp ticket classifier. Analyze customer support tickets and classify them into these categories:\n\nCATEGORIES:\n1. refund - Customer wants money back\n2. regeneration - Customer wants changes to existing headshots  \n3. sppam - Generic spam/promotional emails\n4. pictures-not-received-spam - Customer didn't receive their headshots\n5. invoice - Customer needs receipt/documentation\n6. reupload - Customer wants to submit new photos\n7. influencers - Partnership/collaboration requests\n8. team-info - Enterprise/team inquiries\n9. feedback - Customer providing opinions/suggestions\n10. ghost-email - Customer contact but no system record\n11. linkedin - LinkedIn sharing requests for free generation\n12. miscellaneous - Unclear intent or low confidence\n\nINSTRUCTIONS:\n1. Use semantic search in vector database to find similar tickets\n2. Analyze subject + message content for intent\n3. Match keywords and context against categories\n4. If confidence < 70%, classify as \"miscellaneous\"\n\nPRIORITY RULES:\n- Refund requests override other intents\n- \"Never received photos\" = pictures-not-received-spam\n- Modification requests = regeneration\n- When uncertain, choose \"miscellaneous\"\n\nEXAMPLES:\n\"I want my money back\" → refund (95%)\n\"Can you make my hair shorter?\" → regeneration (90%)\n\"SEO services for your website\" → sppam (95%)\n\"I never got my headshots\" → pictures-not-received-spam (90%)\n\"I need a receipt\" → invoice (95%)\n\"Hello, I have a question\" → miscellaneous (30%) \nIMPORTANT FORMATTING NOTES: \n1. Return JSON: \n{\n  \"ticket\": {\n    \"comment\": {\n      \"body\": \"{\"classification\": \"category\", \"confidence\": \"confidence score [0-100]\", \"reasoning\": \"explanation\"}\",\n      \"public\": false\n    }\n  }\n}\n\n\n2. Use proper line breaks with \"\\\\n\" (double backslash) in your raw string output to ensure correct escaping.\n3. Ensure the JSON is properly formatted and valid.\n4. Keep your responses clear, concise, and helpful.\n5. Quote all JSON keys and string values properly.\n"
+        }
+      },
+      "type": "@n8n/n8n-nodes-langchain.agent",
+      "typeVersion": 1.9,
+      "position": [
+        -460,
+        360
+      ],
+      "id": "263ee704-e15a-4419-91f7-fb13f7ef96be",
+      "name": "Responses Agent"
+    },
+    {
+      "parameters": {
+        "promptType": "define",
+        "text": "={{ $json.ticketInfo }}",
+        "options": {
+          "systemMessage": "Read the entire ticket and generate a succinct FAQ (question and answer pair) that captures the essence of the entire ticket. \nSo that this FAQ could have essentially solved the first message from the customer in one shot.\n\nOutput in plain text\nQuestion: string\nAnswer: string"
+        }
+      },
+      "type": "@n8n/n8n-nodes-langchain.agent",
+      "typeVersion": 1.9,
+      "position": [
+        -520,
+        860
+      ],
+      "id": "c4334f99-8199-4515-b37f-63c2690a293a",
+      "name": "FAQ Agent",
+      "disabled": true
+    },
+    {
+      "parameters": {
+        "operation": "append",
+        "documentId": "[REDACTED]",
+        "sheetName": "[REDACTED]",
+        "columns": {
+          "mappingMode": "defineBelow",
+          "value": {
+            "Date": "={{ $('HTTP Request3').item.json.ticket.updated_at }}",
+            "Ticket Subject": "={{ $('HTTP Request3').item.json.ticket.subject }}",
+            "Ticket Body": "={{ $('Flatten').item.json.ticketInfo }}",
+            "Ticket ID": "={{ $('HTTP Request3').item.json.ticket.id }}",
+            "FAQ": "={{ $json.output }}"
+          },
+          "matchingColumns": [],
+          "schema": [
+            {
+              "id": "Date",
+              "displayName": "Date",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "Ticket ID",
+              "displayName": "Ticket ID",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "Ticket Subject",
+              "displayName": "Ticket Subject",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "Ticket Body",
+              "displayName": "Ticket Body",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "FAQ",
+              "displayName": "FAQ",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            }
+          ],
+          "attemptToConvertTypes": false,
+          "convertFieldsToString": false
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.googleSheets",
+      "typeVersion": 4.5,
+      "position": [
+        -140,
+        860
+      ],
+      "id": "c24d99cf-1567-47de-945c-12f6b45d67f4",
+      "name": "Google Sheets1",
+      "disabled": true
+    },
+    {
+      "parameters": {
+        "mode": "retrieve-as-tool",
+        "toolDescription": "Get tickets tag and metadata ",
+        "qdrantCollection": {
+          "__rl": true,
+          "value": "ticket_taxonomy",
+          "mode": "list",
+          "cachedResultName": "ticket_taxonomy"
+        },
+        "topK": 2,
+        "includeDocumentMetadata": false,
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.vectorStoreQdrant",
+      "typeVersion": 1.3,
+      "position": [
+        -240,
+        560
+      ],
+      "id": "47cff8ed-03e5-4913-8af4-5cb4e7467c12",
+      "name": "Qdrant Vector Store",
+      "credentials": {
+        "qdrantApi": {
+          "id": "QCOWNL1HWu7LA8ej",
+          "name": "QdrantApi account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.embeddingsOpenAi",
+      "typeVersion": 1.2,
+      "position": [
+        -300,
+        700
+      ],
+      "id": "4c973968-959d-4db8-8a83-08a4a28d3f66",
+      "name": "Embeddings OpenAI",
+      "credentials": {
+        "openAiApi": {
+          "id": "30kBnjLv7t9OTeMm",
+          "name": "OpenAi account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "operation": "append",
+        "documentId": "[REDACTED]",
+        "sheetName": "[REDACTED]",
+        "columns": {
+          "mappingMode": "defineBelow",
+          "value": {
+            "Ticket ID": "={{ $json.ticket.id }}",
+            "Date": "={{ $json.ticket.created_at }}",
+            "Ticket Subject": "={{ $('Process Entire Ticket').item.json.subject }}",
+            "Ticket Body": "={{ $('Process Entire Ticket').item.json.conversation }}",
+            "Response": "={{ $('Code').item.json.ticket.comment.body }}"
+          },
+          "matchingColumns": [],
+          "schema": [
+            {
+              "id": "Date",
+              "displayName": "Date",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "Ticket ID",
+              "displayName": "Ticket ID",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "Ticket Subject",
+              "displayName": "Ticket Subject",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "Ticket Body",
+              "displayName": "Ticket Body",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "Response",
+              "displayName": "Response",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            }
+          ],
+          "attemptToConvertTypes": false,
+          "convertFieldsToString": false
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.googleSheets",
+      "typeVersion": 4.5,
+      "position": [
+        1080,
+        360
+      ],
+      "id": "2c5c6f66-2b42-4e57-a8d8-020897df27a9",
+      "name": "Append row in sheet",
+      "credentials": {
+        "googleSheetsOAuth2Api": {
+          "id": "AztuTWlgwCAqHmoC",
+          "name": "Google Sheets account"
+        }
+      },
+      "disabled": true
+    },
+    {
+      "parameters": {
+        "mode": "runOnceForEachItem",
+        "jsCode": "// Add a new field called 'myNewField' to the JSON of the item\n$input.item.json.myNewField = 1;\n\nreturn $input.item;"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        360,
+        360
+      ],
+      "id": "5cc90cc3-e066-4782-a9ed-92e0096da6ed",
+      "name": "Code1",
+      "disabled": true
+    }
+  ],
+  "pinData": {},
+  "connections": {
+    "Process Entire Ticket": {
+      "main": [
+        [
+          {
+            "node": "Flatten",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "HTTP Request2": {
+      "main": [
+        [
+          {
+            "node": "Process Entire Ticket",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "HTTP Request3": {
+      "main": [
+        [
+          {
+            "node": "HTTP Request2",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Webhook": {
+      "main": [
+        [
+          {
+            "node": "HTTP Request3",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Flatten": {
+      "main": [
+        [
+          {
+            "node": "Switch",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Switch": {
+      "main": [
+        [
+          {
+            "node": "Responses Agent",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "FAQ Agent",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Responses Agent",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "OpenAI Chat Model": {
+      "ai_languageModel": [
+        [
+          {
+            "node": "Responses Agent",
+            "type": "ai_languageModel",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Code": {
+      "main": [
+        [
+          {
+            "node": "HTTP Request1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "HTTP Request1": {
+      "main": [
+        [
+          {
+            "node": "Code1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "OpenAI Chat Model1": {
+      "ai_languageModel": [
+        [
+          {
+            "node": "FAQ Agent",
+            "type": "ai_languageModel",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Responses Agent": {
+      "main": [
+        [
+          {
+            "node": "Code",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "FAQ Agent": {
+      "main": [
+        [
+          {
+            "node": "Google Sheets1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Qdrant Vector Store": {
+      "ai_tool": [
+        [
+          {
+            "node": "Responses Agent",
+            "type": "ai_tool",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Embeddings OpenAI": {
+      "ai_embedding": [
+        [
+          {
+            "node": "Qdrant Vector Store",
+            "type": "ai_embedding",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Code1": {
+      "main": [
+        [
+          {
+            "node": "Append row in sheet",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "active": true,
+  "settings": {
+    "executionOrder": "v1"
+  },
+  "versionId": "cb4a2479-9154-4820-ae94-92e12eb52d20",
+  "meta": {
+    "templateCredsSetupCompleted": true,
+    "instanceId": "7adf47b5129db171655c948bb97b81da8f5b40c2e225cc67f6ae2566e5dc8c33"
+  },
+  "id": "WiKXdB3gVljPxzCo",
+  "tags": [
+    {
+      "createdAt": "2025-07-23T09:46:54.511Z",
+      "updatedAt": "2025-07-23T09:46:54.511Z",
+      "id": "C8BcfUYowBJIzkoA",
+      "name": "youtube"
+    }
+  ]
+}

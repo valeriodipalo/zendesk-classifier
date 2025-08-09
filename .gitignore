@@ -1,0 +1,21 @@
+# Python
+__pycache__/
+*.pyc
+
+# macOS
+.DS_Store
+
+# Env files (never commit secrets)
+.env
+app/.env
+
+# Vercel local files
+.vercel/
+
+# Outputs and notebooks
+outputs/
+*.ipynb
+
+# Editors/IDE
+.vscode/
+.idea/ 
