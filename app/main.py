@@ -24,12 +24,12 @@ def main() -> None:
     parser = build_cli()
     args = parser.parse_args()
 
-    # Load env from project root and app/.env if present
+    # Load env from project root and app/.env if present (override shell to avoid stale values)
     root_env = Path(__file__).resolve().parents[1] / ".env"
     app_env = Path(__file__).resolve().parent / ".env"
     for env_path in [root_env, app_env]:
         if env_path.exists():
-            load_dotenv(env_path)
+            load_dotenv(env_path, override=True)
 
     if args.debug:
         os.environ["DEBUG_CLASSIFIER"] = "1"
@@ -51,6 +51,9 @@ def main() -> None:
         print("Subject:", subject)
         print("Conversation items:", len(conversation_items))
         print("Conversation text length:", len(conversation_text))
+        # Show env snapshot (non-sensitive)
+        print("ZENDESK_SUBDOMAIN:", os.getenv("ZENDESK_SUBDOMAIN"))
+        print("ZENDESK_EMAIL:", os.getenv("ZENDESK_EMAIL"))
 
     if args.vector:
         classifier = VectorLlmClassifier()
