@@ -18,4 +18,9 @@ outputs/
 
 # Editors/IDE
 .vscode/
-.idea/ 
+.idea/
+
+# n8n automations and exports
+n8n/
+*n8n*.json
+n8n_*.json 
