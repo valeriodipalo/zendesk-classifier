@@ -9,6 +9,9 @@ import json
 import pandas as pd
 from datetime import datetime
 import time
+import os
+from pathlib import Path
+from dotenv import load_dotenv
 
 class ZendeskConversationExtractor:
     def __init__(self, subdomain: str, email: str, api_token: str):
@@ -93,11 +96,19 @@ def main():
     df = pd.read_csv('single_tag_tickets_for_finetuning.csv')
     print(f"Loaded {len(df)} tickets for conversation extraction")
     
-    # Zendesk credentials
-    SUBDOMAIN = "aisuitupsupport"
-    EMAIL = "valerio@aisuitup.com"
-    API_TOKEN = "LIevAV0gMgqZXU8IVvXnDNGebE0TMpjESMITlqqs"
-    
+    # Load env from repo root (and scripts/.env as fallback)
+    BASE = Path(__file__).resolve().parents[1]
+    load_dotenv(BASE / ".env")
+    load_dotenv(Path(__file__).resolve().parent / ".env")
+
+    # Zendesk credentials from env
+    SUBDOMAIN = os.getenv("ZENDESK_SUBDOMAIN", "").strip()
+    EMAIL = os.getenv("ZENDESK_EMAIL", "").strip()
+    API_TOKEN = os.getenv("ZENDESK_API_TOKEN", "").strip()
+
+    if not SUBDOMAIN or not EMAIL or not API_TOKEN:
+        raise SystemExit("Missing ZENDESK_SUBDOMAIN, ZENDESK_EMAIL or ZENDESK_API_TOKEN in environment")
+
     extractor = ZendeskConversationExtractor(SUBDOMAIN, EMAIL, API_TOKEN)
     
     # Extract conversations
