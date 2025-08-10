@@ -80,6 +80,22 @@ def main() -> None:
     })
     client.add_private_comment(args.ticket_id, payload)
     print("Private note added to the ticket.")
+    
+    # Also add the response template as a second private note if available
+    from pathlib import Path
+    mapping_file = Path(__file__).resolve().parents[1] / "DATA" / "Ticket_map_key_value.json"
+    try:
+        if mapping_file.exists():
+            with mapping_file.open("r", encoding="utf-8") as f:
+                mapping = json.load(f)
+            template = mapping.get(result.classification.lower())
+            if template:
+                client.add_private_comment(args.ticket_id, f"Template: {template}")
+                print("Response template added as private note.")
+            else:
+                print(f"No template found for classification: {result.classification}")
+    except Exception as e:
+        print(f"Failed to load response template: {e}")
 
 
 if __name__ == "__main__":

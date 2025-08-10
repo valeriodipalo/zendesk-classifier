@@ -20,7 +20,6 @@ DEBUG = os.getenv("DEBUG_CLASSIFIER") == "1"
 
 
 def choose_classifier() -> object:
-    # Prefer vector LLM if Qdrant configured; else plain LLM; else rule-based
     if os.getenv("QDRANT_URL") and os.getenv("OPENAI_API_KEY"):
         try:
             return VectorLlmClassifier()
@@ -34,28 +33,15 @@ def choose_classifier() -> object:
     return RuleBasedClassifier()
 
 
-def recent_classification_exists(client: ZendeskClient, ticket_id: int, window_minutes: int = 10) -> bool:
+def has_internal_comments(client: ZendeskClient, ticket_id: int) -> bool:
+    """Return True if the ticket already contains ANY private (internal) comment."""
     try:
-        data = client.get_ticket_comments(ticket_id, public_only=False)
+        comments = client.get_ticket_comments(ticket_id, public_only=False)
     except Exception:
         return False
-    cutoff = datetime.now(timezone.utc) - timedelta(minutes=window_minutes)
-    for c in reversed(data):
-        if c.get("public") is True:
-            continue
-        body = (c.get("body") or c.get("plain_body") or "").strip()
-        if not body:
-            continue
-        if '"classification"' in body:
-            # Idempotency: if very recent, skip
-            created_at = c.get("created_at")
-            try:
-                if created_at:
-                    created_dt = datetime.fromisoformat(created_at.replace('Z', '+00:00'))
-                    if created_dt >= cutoff:
-                        return True
-            except Exception:
-                return True
+    for c in comments:
+        if c.get("public") is False:
+            return True
     return False
 
 
@@ -77,6 +63,7 @@ def load_response_mapping() -> dict:
     candidates += [
         ROOT / "data" / "response_templates.json",
         ROOT / "DATA" / "response_templates.json",
+        ROOT / "DATA" / "Ticket_map_key_value.json",
     ]
 
     for p in candidates:
@@ -141,16 +128,15 @@ class handler(BaseHTTPRequestHandler):
         if not ticket_id:
             return self._send(400, {"ok": False, "error": "missing ticket_id"})
 
-        # Run classification
         try:
             config = ZendeskConfig.from_env()
             client = ZendeskClient(config)
 
-            # Idempotency for classification note
-            if recent_classification_exists(client, int(ticket_id)):
-                return self._send(200, {"ok": True, "skipped": True, "reason": "recent classification exists"})
+            # Only act if there are NO internal comments on the ticket
+            if has_internal_comments(client, int(ticket_id)):
+                return self._send(200, {"ok": True, "skipped": True, "reason": "has internal comments"})
 
-            # Build conversation
+            # Build conversation and classify
             convo = client.build_conversation(int(ticket_id))
             subject = convo.get("subject", "")
             conversation_items = convo.get("conversation", [])
@@ -170,13 +156,16 @@ class handler(BaseHTTPRequestHandler):
             })
             client.add_private_comment(int(ticket_id), class_body)
 
-            # Load JSON mapping and post the mapped internal answer (private) if available
+            # Post mapped internal answer as a second private note (if available)
             mapping = load_response_mapping()
             answer = mapping.get((result.classification or "").lower())
+            if not answer and (result.classification or "").lower() != "miscellaneous":
+                # Edge-case fallback
+                answer = mapping.get("miscellaneous", "human intervention required")
             if answer:
-                client.add_private_comment(int(ticket_id), answer)
-                if DEBUG:
-                    print(f"Posted mapped internal answer for category '{result.classification}'")
+                # Add prefix to make it clear this is the response template
+                template_note = f"Response Template:\n\n{answer}"
+                client.add_private_comment(int(ticket_id), template_note)
 
             return self._send(200, {
                 "ok": True,
@@ -186,5 +175,4 @@ class handler(BaseHTTPRequestHandler):
             })
         except Exception as e:
             traceback.print_exc()
-            # Return 200 to avoid repeated Zendesk retries; include error in body
             return self._send(200, {"ok": False, "error": str(e)}) 
